@@ -81,6 +81,7 @@ void StateHolder::process(const Obj &obj) {
         std::lock_guard<std::recursive_mutex> guard(mutex);
         currentStaticObjects->w = obj.getIntProp("w");
         currentStaticObjects->h = obj.getIntProp("h");
+        currentStaticObjects->cellSize = obj.getIntProp("cellSize");
         currentStaticObjects->mode3d = false;
 
         return;

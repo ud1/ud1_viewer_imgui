@@ -1052,6 +1052,28 @@ void SceneRenderer::render(const StaticObjects *staticObjects, const Frame *fram
         nvgLineTo(vg, 0, 0);
         nvgStroke(vg);
 
+        int cellSize = staticObjects->cellSize;
+        if (cellSize > 0 && cellSize / zoom < 0.2)
+        {
+            nvgStrokeColor(vg, nvgRGB(0.7,0.7,0.7));
+            nvgStrokeWidth(vg, 0.5 / zoom);
+            nvgBeginPath(vg);
+
+            for (int x = cellSize; x < staticObjects->w; x += cellSize)
+            {
+                nvgMoveTo(vg, x, 0);
+                nvgLineTo(vg, x, staticObjects->h);
+            }
+
+            for (int y = cellSize; y < staticObjects->w; y += cellSize)
+            {
+                nvgMoveTo(vg, 0, y);
+                nvgLineTo(vg, staticObjects->w, y);
+            }
+
+            nvgStroke(vg);
+        }
+
         for (const SObj &obj : staticObjects->objs)
             renderObj2d(obj, staticObjects->h);
 
@@ -1179,9 +1201,9 @@ void SceneRenderer::renderObj2d(const SObj &sobj, double h) {
         if (hw == 0)
             hw = 1;
 
-        double dw = getDouble("dw", sobj);
-        if (dw == 0)
-            dw = 0.45;
+        double dwDef = getDouble("dw", sobj);
+        if (dwDef == 0)
+            dwDef = 0.45;
 
         for (int i = 0; i < 10000; ++i)
         {
@@ -1189,6 +1211,9 @@ void SceneRenderer::renderObj2d(const SObj &sobj, double h) {
             oss << "p" << i;
             if (sobj.count(oss.str()))
             {
+                double dwOvr = getDouble("dw" + std::to_string(i), sobj);
+                double dw = dwOvr > 0 ? dwOvr : dwDef;
+
                 P pi = getP(oss.str(), sobj);
 
                 nvgBeginPath(vg);
@@ -1282,11 +1307,14 @@ void SceneRenderer::imguiInputProcessing(const StaticObjects *staticObjects) {
 
         if (rulerStarted)
         {
-            P delta = toLocalRelP(mousePos) - rulerStart;
+            P localP = toLocalRelP(mousePos);
+            P delta = localP - rulerStart;
             oss.str("");
             oss.clear();
 
-            oss << "Dist: " << delta.len() << " (" << delta.x << " " << (settings.yIsUp ? -delta.y : delta.y) << ")";
+            int intDist = std::abs((int) localP.x - (int) rulerStart.x) + std::abs((int) localP.y - (int) rulerStart.y);
+            oss << "Dist: " << delta.len() << " (" << delta.x << "," << (settings.yIsUp ? -delta.y : delta.y) << ": " << intDist << ")";
+
             rullerStatus = oss.str();
         }
         else

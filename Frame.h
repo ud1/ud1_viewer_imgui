@@ -14,10 +14,11 @@ class StaticObjects
 {
 public:
     int w = 1000, h = 1000;
+    int cellSize = 0;
     bool mode3d = false;
 
     P minP, maxP;
-    double hMin, hMax, cellSize;
+    double hMin, hMax;
 
     std::vector<SObj> objs;
 };

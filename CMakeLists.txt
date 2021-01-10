@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB_RECURSE imgui_Sources
         imgui/*.cpp imgui/*.h nanovg/nanovg.c)
 
-SET(CMAKE_CXX_FLAGS "-D_LINUX -O0 -g -Wall -Wno-unknown-pragmas -Werror=return-type ")
+SET(CMAKE_CXX_FLAGS "-D_LINUX -O2 -g -Wall -Wno-unknown-pragmas -Werror=return-type ")
 
 include_directories(imgui include nanovg)
 
